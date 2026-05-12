@@ -1,10 +1,10 @@
-import apiClient from './apiClient';
+import api from './axiosInstance';
 
 export const uploadObjectCall = async (file, onUploadProgress) => {
   const formData = new FormData();
   formData.append('modelFile', file);
 
-  const response = await apiClient.post(`/objects/upload`, formData, {
+  const response = await api.post(`/objects/upload`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     },
@@ -14,21 +14,21 @@ export const uploadObjectCall = async (file, onUploadProgress) => {
 };
 
 export const getObjectsCall = async () => {
-  const response = await apiClient.get(`/objects`);
+  const response = await api.get(`/objects`);
   return response.data;
 };
 
 export const getObjectByIdCall = async (id) => {
-  const response = await apiClient.get(`/objects/${id}`);
+  const response = await api.get(`/objects/${id}`);
   return response.data;
 };
 
 export const updateCameraStateCall = async (id, position, target) => {
-  const response = await apiClient.put(`/objects/${id}/camera`, { position, target });
+  const response = await api.put(`/objects/${id}/camera`, { position, target });
   return response.data;
 };
 
 export const deleteObjectCall = async (id) => {
-  const response = await apiClient.delete(`/objects/${id}`);
+  const response = await api.delete(`/objects/${id}`);
   return response.data;
 };
