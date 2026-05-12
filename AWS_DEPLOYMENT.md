@@ -1,6 +1,6 @@
 # AWS Deployment Architecture & Guide
 
-This guide explains how to deploy the **3D Object Viewer & Manager** securely on AWS, leveraging EC2, S3, and Nginx.
+This guide explains how to deploy **Real Visual** securely on AWS, leveraging EC2, S3, and Nginx.
 
 ## Architecture Overview
 - **Storage:** AWS S3 for saving `.glb` model files securely. The application uses pre-signed URLs to fetch the assets securely without exposing the bucket.

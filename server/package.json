@@ -1,7 +1,7 @@
 {
   "name": "3d-object-viewer-server",
   "version": "1.0.0",
-  "description": "Backend for 3D Object Viewer",
+  "description": "Backend for Real Visual",
   "main": "index.js",
   "type": "module",
   "scripts": {

@@ -1,4 +1,4 @@
-# 3D Object Viewer & Manager
+# Real Visual
 
 A production-grade, full-stack MERN application for uploading, managing, and viewing 3D models (`.glb` files) interactively in the browser.
 

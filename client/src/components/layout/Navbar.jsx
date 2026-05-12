@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { APP_NAME } from '../../config/branding';
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -15,7 +16,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="container navbar-content">
         <Link to="/" className="navbar-brand">
-          3D Manager
+          {APP_NAME}
         </Link>
         <div className="navbar-links">
           {isAuthenticated ? (
