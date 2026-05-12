@@ -1,5 +1,9 @@
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import { sendSuccess, sendError } from '../utils/apiResponse.js';
+
+// Regex validators
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -8,14 +12,29 @@ export const registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    // Backend Validation
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Please provide all required fields' });
+      return sendError(res, 400, 'Please provide all required fields');
+    }
+    if (username.length < 3) {
+      return sendError(res, 400, 'Username must be at least 3 characters');
+    }
+    if (!emailRegex.test(email)) {
+      return sendError(res, 400, 'Please provide a valid email address');
+    }
+    if (password.length < 6) {
+      return sendError(res, 400, 'Password must be at least 6 characters');
     }
 
-    const userExists = await User.findOne({ email });
-
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+    // Duplicate Checks
+    const existingUserByEmail = await User.findOne({ email });
+    if (existingUserByEmail) {
+      return sendError(res, 400, 'This account already exists. Please login instead.');
+    }
+    
+    const existingUserByUsername = await User.findOne({ username });
+    if (existingUserByUsername) {
+      return sendError(res, 400, 'This username is already taken. Please choose another.');
     }
 
     const user = await User.create({
@@ -25,18 +44,18 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
-      res.status(201).json({
+      return sendSuccess(res, 201, {
         _id: user._id,
         username: user.username,
         email: user.email,
         token: generateToken(user._id)
-      });
+      }, 'Account created successfully');
     } else {
-      res.status(400).json({ message: 'Invalid user data' });
+      return sendError(res, 400, 'Invalid user data provided');
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error during registration' });
+    console.error("Register Error:", error);
+    return sendError(res, 500, 'Server error during registration');
   }
 };
 
@@ -48,24 +67,30 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
+      return sendError(res, 400, 'Please provide email and password');
     }
 
     const user = await User.findOne({ email });
 
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        token: generateToken(user._id)
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+    if (!user) {
+      return sendError(res, 404, 'No account found with this email');
     }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return sendError(res, 401, 'Incorrect password');
+    }
+
+    return sendSuccess(res, 200, {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      token: generateToken(user._id)
+    }, 'Logged in successfully');
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error during login' });
+    console.error("Login Error:", error);
+    return sendError(res, 500, 'Server error during login');
   }
 };
 
@@ -74,11 +99,9 @@ export const loginUser = async (req, res) => {
 // @access  Public
 export const logoutUser = async (req, res) => {
   try {
-    // Since we use JWT in localStorage, logout is primarily handled client-side.
-    // We provide this endpoint for completeness (e.g. tracking or token invalidation later)
-    res.status(200).json({ message: 'Logged out successfully' });
+    return sendSuccess(res, 200, {}, 'Logged out successfully');
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error during logout' });
+    console.error("Logout Error:", error);
+    return sendError(res, 500, 'Server error during logout');
   }
 };

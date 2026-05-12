@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { loginCall } from '../../api/authApi';
 import { useAuth } from '../../hooks/useAuth';
+import { isValidEmail } from '../../utils/validators';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const { login } = useAuth();
@@ -17,15 +18,27 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+
+    if (!isValidEmail(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
+    if (!password) {
+      toast.error('Please enter your password');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const data = await loginCall(email, password);
       login(data);
+      toast.success('Welcome back!');
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login. Please try again.');
+      // The error is already parsed cleanly by our centralized Axios interceptor
+      toast.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -33,11 +46,6 @@ const LoginForm = () => {
 
   return (
     <div className="card">
-      {error && (
-        <div className="toast error" style={{ position: 'relative', marginBottom: '1rem', bottom: 'auto', right: 'auto' }}>
-          {error}
-        </div>
-      )}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="form-label" htmlFor="email">Email</label>
@@ -49,6 +57,7 @@ const LoginForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="Enter your email"
+            disabled={isLoading}
           />
         </div>
         <div className="form-group">
@@ -61,6 +70,7 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder="Enter your password"
+            disabled={isLoading}
           />
         </div>
         <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={isLoading}>

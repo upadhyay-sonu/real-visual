@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import { registerCall } from '../../api/authApi';
 import { useAuth } from '../../hooks/useAuth';
+import { isValidEmail, isValidPassword, isValidUsername } from '../../utils/validators';
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const { login } = useAuth();
@@ -16,10 +17,22 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
+    // Frontend Validation
+    if (!isValidUsername(username)) {
+      toast.error('Username must be at least 3 characters');
+      return;
+    }
+    if (!isValidEmail(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    if (!isValidPassword(password)) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
@@ -28,9 +41,11 @@ const RegisterForm = () => {
     try {
       const data = await registerCall(username, email, password);
       login(data);
+      toast.success('Account created successfully!');
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to register. Please try again.');
+      // The error is already parsed cleanly by our centralized Axios interceptor
+      toast.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -38,11 +53,6 @@ const RegisterForm = () => {
 
   return (
     <div className="card">
-      {error && (
-        <div className="toast error" style={{ position: 'relative', marginBottom: '1rem', bottom: 'auto', right: 'auto' }}>
-          {error}
-        </div>
-      )}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="form-label" htmlFor="username">Username</label>
@@ -54,6 +64,7 @@ const RegisterForm = () => {
             onChange={(e) => setUsername(e.target.value)}
             required
             placeholder="Choose a username"
+            disabled={isLoading}
           />
         </div>
         <div className="form-group">
@@ -66,6 +77,7 @@ const RegisterForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="Enter your email"
+            disabled={isLoading}
           />
         </div>
         <div className="form-group">
@@ -79,6 +91,7 @@ const RegisterForm = () => {
             required
             placeholder="Create a password"
             minLength="6"
+            disabled={isLoading}
           />
         </div>
         <div className="form-group">
@@ -92,6 +105,7 @@ const RegisterForm = () => {
             required
             placeholder="Confirm your password"
             minLength="6"
+            disabled={isLoading}
           />
         </div>
         <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={isLoading}>

@@ -1,6 +1,7 @@
 import axios from "axios";
 import API_BASE_URL from "../config/api";
 import { getToken } from "../utils/tokenStorage";
+import { parseApiError } from "../utils/errorParser";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -25,8 +26,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("Global API Error:", error.response?.data?.message || error.message);
-    return Promise.reject(error);
+    // Parse the error into a clean string so UI components never see the raw Axios object
+    const cleanErrorMessage = parseApiError(error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("API Call Failed:", cleanErrorMessage);
+    }
+    return Promise.reject(cleanErrorMessage);
   }
 );
 
