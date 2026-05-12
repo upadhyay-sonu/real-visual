@@ -88,8 +88,8 @@ export const useThreeScene = (canvasRef, modelUrl, savedCameraState, onCameraCha
         // console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
       },
       (err) => {
-        console.error('Error loading model', err);
-        setError('Failed to load the 3D model.');
+        console.error(`GLB Load Error [${modelUrl}]:`, err);
+        setError('Failed to load the 3D model. Please check your connection or file integrity.');
         setLoading(false);
       }
     );

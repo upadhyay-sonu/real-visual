@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import SceneCanvas from '../components/viewer/SceneCanvas';
 import ControlPanel from '../components/viewer/ControlPanel';
 import { getObjectByIdCall, updateCameraStateCall } from '../api/objectApi';
+import { getFileUrl } from '../config/api';
 
 const ViewerPage = () => {
   const { id } = useParams();
@@ -79,6 +80,8 @@ const ViewerPage = () => {
     );
   }
 
+  const finalModelUrl = getFileUrl(model.path || model.fileUrl);
+
   return (
     <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
       {/* Top info bar */}
@@ -104,10 +107,10 @@ const ViewerPage = () => {
       </div>
 
       {/* The 3D Canvas */}
-      {console.log('Model URL:', `http://localhost:5000${model.path || model.fileUrl}`)}
+      {process.env.NODE_ENV !== 'production' && console.log('Resolved Model URL:', finalModelUrl)}
       <SceneCanvas 
         ref={canvasRef}
-        modelUrl={`http://localhost:5000${model.path || model.fileUrl}`}
+        modelUrl={finalModelUrl}
         savedCameraState={model.cameraState}
         onCameraChange={handleCameraChange}
       />
