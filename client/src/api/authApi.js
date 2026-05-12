@@ -1,12 +1,8 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL 
-  ? `${import.meta.env.VITE_API_URL}/auth` 
-  : '/api/auth';
+import apiClient from './apiClient';
 
 export const loginCall = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
+    const response = await apiClient.post(`/auth/login`, { email, password });
     return response.data;
   } catch (error) {
     console.error("Login API Error:", error);
@@ -16,7 +12,7 @@ export const loginCall = async (email, password) => {
 
 export const registerCall = async (username, email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, { username, email, password });
+    const response = await apiClient.post(`/auth/register`, { username, email, password });
     return response.data;
   } catch (error) {
     console.error("Register API Error:", error);
@@ -26,7 +22,7 @@ export const registerCall = async (username, email, password) => {
 
 export const logoutCall = async () => {
   try {
-    const response = await axios.post(`${API_URL}/logout`);
+    const response = await apiClient.post(`/auth/logout`);
     return response.data;
   } catch (error) {
     console.error("Logout API Error:", error);
