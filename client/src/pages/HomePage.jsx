@@ -50,7 +50,7 @@ const HomePage = () => {
   return (
     <div className="container" style={{ padding: '2rem 1.5rem' }}>
       <header style={{ marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>Welcome, {user?.username || 'User'}</h1>
+        <h1 style={{ fontSize: '2.25rem', marginBottom: '0.5rem' }}>Welcome, {user?.username || 'Guest'}</h1>
         <p style={{ color: 'var(--text-secondary)' }}>Manage and view your 3D models</p>
       </header>
 

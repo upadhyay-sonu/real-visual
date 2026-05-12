@@ -48,7 +48,7 @@ export const registerUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
-        token: generateToken(user._id)
+        token: generateToken(user._id, user.username)
       }, 'Account created successfully');
     } else {
       return sendError(res, 400, 'Invalid user data provided');
@@ -85,7 +85,7 @@ export const loginUser = async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id)
+      token: generateToken(user._id, user.username)
     }, 'Logged in successfully');
 
   } catch (error) {

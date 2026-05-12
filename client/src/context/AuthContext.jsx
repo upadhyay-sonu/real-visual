@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { getToken, setToken, removeToken } from '../utils/tokenStorage';
+import { getToken, setToken, removeToken, setUserDetails, getUserDetails, removeUserDetails } from '../utils/tokenStorage';
 
 export const AuthContext = createContext();
 
@@ -30,8 +30,12 @@ export const AuthProvider = ({ children }) => {
         } else {
           try {
             const decoded = jwtDecode(token);
-            // In a real app we might fetch the full user profile here
-            setUser({ id: decoded.id });
+            const savedUser = getUserDetails();
+            // Recover username from JWT if present, otherwise from local storage fallback
+            setUser({ 
+              id: decoded.id, 
+              username: decoded.username || savedUser?.username 
+            });
             setIsAuthenticated(true);
           } catch (e) {
             logout();
@@ -46,16 +50,19 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     setToken(userData.token);
-    setUser({
+    const userObj = {
       id: userData._id,
       username: userData.username,
       email: userData.email
-    });
+    };
+    setUserDetails(userObj);
+    setUser(userObj);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
     removeToken();
+    removeUserDetails();
     setUser(null);
     setIsAuthenticated(false);
   };
