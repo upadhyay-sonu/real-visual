@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { getToken } from '../utils/tokenStorage';
 
-const API_URL = '/api/objects';
+const API_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/objects` 
+  : '/api/objects';
 
 // Setup axios instance with auth header
 const createAuthInstance = () => {
