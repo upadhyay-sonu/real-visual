@@ -28,11 +28,17 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "http://localhost:3000",
-    process.env.FRONTEND_URL || "https://YOUR_VERCEL_DOMAIN.vercel.app"
-  ],
-  credentials: true
+    "https://real-visual-pages-dev.pages.dev",
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Explicit preflight handling
+app.options('*', cors());
+
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));
 
